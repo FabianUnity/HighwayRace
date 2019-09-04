@@ -1,10 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Unity.Collections;
+﻿using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
-using Unity.Mathematics;
-using UnityEngine;
 
 public class RaceSystem : JobComponentSystem
 {
@@ -70,18 +66,36 @@ public class RaceSystem : JobComponentSystem
             }
         }
     }
+    
+    private struct ExtractCarPositions : IJobForEach<CarElementPositionComponent,PositionComponent>
+    {
+        [NativeDisableParallelForRestriction] public NativeArray<CarBufferElement> CarElements;
+        
+        public void Execute([ReadOnly] ref CarElementPositionComponent carElementPosition, [ReadOnly] ref PositionComponent position)
+        {
+            var carElement = CarElements[carElementPosition.Value];
+            carElement.Position = position.Position.x;
+            CarElements[carElementPosition.Value] = carElement;
+        }
+    }
 
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
         var highWayEntity = _highWayQuery.GetSingletonEntity();
         var bufferLookup = GetBufferFromEntity<CarBufferElement>(false);
         var buffer = bufferLookup[highWayEntity];
+        var bufferArray = buffer.AsNativeArray();
+        
+        var extractJobHandle = new ExtractCarPositions()
+        {
+            CarElements = bufferArray
+        }.Schedule(this,inputDeps);
                    
         var updateJobHandle = new UpdatePositions()
         {
             CommandBuffer = _entityCommandBufferSystem.CreateCommandBuffer(),
-            CarElements = buffer.AsNativeArray()
-        }.Schedule(inputDeps);
+            CarElements = bufferArray
+        }.Schedule(extractJobHandle);
 
         //updateJobHandle.Complete();
         _entityCommandBufferSystem.AddJobHandleForProducer(updateJobHandle);

@@ -6,6 +6,7 @@ public struct CarBufferElement : IBufferElementData
     public const float _2PI = 2 * math.PI;
     
     public float Position;
+    public int Lane;
     public int NextInLane;
     public int NextRight;
     public int NextLeft;
