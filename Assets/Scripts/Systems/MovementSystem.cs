@@ -9,7 +9,7 @@ public class MovementSystem : JobComponentSystem
         public void Execute(ref PositionComponent position, ref SpeedComponent speed)
         {
             //position.Position.y=30;
-            position.Position.x+=speed.CurrentSpeed;
+            position.Position.x+=speed.CurrentSpeed; 
         }
     }
     
