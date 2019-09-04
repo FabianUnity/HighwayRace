@@ -11,7 +11,13 @@
             <e p="PositionComponent.cs" t="Include" />
             <e p="SpeedComponent.cs" t="Include" />
           </e>
+          <e p="Legacy" t="Include">
+            <e p="Highway.cs" t="Include" />
+            <e p="HighwayPiece.cs" t="Include" />
+            <e p="StraightPiece.cs" t="Include" />
+          </e>
           <e p="Systems" t="Include">
+            <e p="MovementSystem.cs" t="Include" />
             <e p="PresentationSystem.cs" t="Include" />
             <e p="SpawnSystem.cs" t="Include" />
           </e>
