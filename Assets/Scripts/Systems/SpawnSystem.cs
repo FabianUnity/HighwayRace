@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Rendering;
@@ -17,6 +18,8 @@ public class SpawnSystem : MonoBehaviour
     {
         Entity prefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(carPrefab, World.Active);
         var entityManager = World.Active.EntityManager;
+        var carElementArray =
+            new NativeArray<CarBufferElement>(carAmount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
 
         for (int i = 0; i < carAmount; i++)
         {
@@ -26,6 +29,27 @@ public class SpawnSystem : MonoBehaviour
             entityManager.SetComponentData(instance, new Translation());
             entityManager.AddComponentData(instance, new PositionComponent { Position = new float2(60, 6) });
             entityManager.AddComponentData(instance, new SpeedComponent {CurrentSpeed = 0, DefaultSpeed = 15, OvertakeSpeed = 20, TargetSpeed = 15});
+            entityManager.AddComponentData(instance, new CarElementPositionComponent(){Value = i});
+            
+            carElementArray[i] = new CarBufferElement()
+            {
+                Position = 0,
+                Entity = instance,
+                NextInLane = -1,
+                NextLeft = -1,
+                NextRight = -1,
+                PrevLane = -1,
+                PrevLeft = -1,
+                PrevRight = -1
+            };
         }
+        
+        //create the race entity
+        var highwayEntity = entityManager.CreateEntity(typeof(HighWayComponent), typeof(CarBufferElement));
+        var raceQuery = entityManager.CreateEntityQuery(typeof(HighWayComponent));
+        raceQuery.SetSingleton(new HighWayComponent());
+
+        var buffer = entityManager.GetBuffer<CarBufferElement>(highwayEntity);
+        buffer.AddRange(carElementArray);
     }
 }
