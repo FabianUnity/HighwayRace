@@ -25,12 +25,24 @@ public class SpawnSystem : MonoBehaviour
         var entityManager = World.Active.EntityManager;
         var carElementArray =
             new NativeArray<CarBufferElement>(carAmount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+        
+        float3 position = float3.zero;
+        float distance = 360f / carAmount;
+        float minRadius = 115f / 4f;
+        float radius = 0;
+        float angle = 0;
+        int land;
 
         for (int i = 0; i < carAmount; i++)
         {
+            Random.InitState(((int) System.DateTime.Now.Ticks) * (i+1));
+            land = Random.Range(0,4);
+            radius = minRadius + (land * 1.7f);
             var instance = entityManager.Instantiate(prefab);
-            entityManager.SetComponentData(instance, new Translation());
-            entityManager.AddComponentData(instance, new PositionComponent { Position = new float2(60 + i*5, (115f/4f)) });
+            position.x = radius * math.cos(angle);
+            position.z = radius * math.sin(angle);
+            entityManager.SetComponentData(instance, new Translation{Value = position});
+            entityManager.AddComponentData(instance, new PositionComponent { Position = new float2(angle, radius) });
             entityManager.AddComponentData(instance, new SpeedComponent {CurrentSpeed = Random.Range(0.007f,0.07f), DefaultSpeed = 15, OvertakeSpeed = 20, TargetSpeed = 15});
             entityManager.AddComponentData(instance, new CarElementPositionComponent(){Value = i});
             
@@ -45,6 +57,8 @@ public class SpawnSystem : MonoBehaviour
                 PrevLeft = -1,
                 PrevRight = -1
             };
+            
+            angle += distance;
         }
         
         //create the race entity
