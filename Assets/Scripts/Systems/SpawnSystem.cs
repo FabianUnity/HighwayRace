@@ -35,18 +35,20 @@ public class SpawnSystem : MonoBehaviour
         float angle = 0;
         int lane;
 
+        float4 laneRadius = new float4(minRadius + landOffset, minRadius + landSize + landOffset, minRadius + (2 * landSize) + landOffset, minRadius + (3 * landSize) + landOffset);
+        
         for (int i = 0; i < carAmount; i++)
         {
             random.InitState((uint)((System.DateTime.Now.Ticks) * (i+1)));
             lane = random.NextInt(0, 4);
-            radius = minRadius + (lane * landSize) + landOffset;
+            radius = laneRadius[lane];
             var instance = entityManager.Instantiate(prefab);
             position.x = radius * math.cos(angle);
             position.z = radius * math.sin(angle);
             entityManager.SetComponentData(instance, new Translation{Value = position});
             entityManager.AddComponentData(instance, new PositionComponent { Position = new float2(angle, radius) });
             float speed = random.NextFloat(0.05f, 1f);
-            entityManager.AddComponentData(instance, new SpeedComponent {CurrentSpeed = 0, DefaultSpeed = speed, OvertakeSpeed = 20, TargetSpeed = 15});
+            entityManager.AddComponentData(instance, new SpeedComponent {CurrentSpeed = speed, DefaultSpeed = speed, OvertakeSpeed = 20, TargetSpeed = 15});
             entityManager.AddComponentData(instance, new CarElementPositionComponent(){Value = i});
             entityManager.AddComponentData(instance, new OvertakerComponent{ CarInFrontSpeed = 0, OvertakeDistance = random.NextFloat(0.05f, 0.1f) });
             entityManager.AddComponentData(instance, new LaneComponent { Lane = lane });
@@ -70,7 +72,8 @@ public class SpawnSystem : MonoBehaviour
         //create the race entity
         var highwayEntity = entityManager.CreateEntity(typeof(HighWayComponent), typeof(CarBufferElement));
         var raceQuery = entityManager.CreateEntityQuery(typeof(HighWayComponent));
-        raceQuery.SetSingleton(new HighWayComponent());
+        
+        raceQuery.SetSingleton(new HighWayComponent { LaneRadius = laneRadius });
 
         var buffer = entityManager.GetBuffer<CarBufferElement>(highwayEntity);
         buffer.AddRange(carElementArray);
