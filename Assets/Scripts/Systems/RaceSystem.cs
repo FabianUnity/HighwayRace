@@ -61,23 +61,6 @@ public class RaceSystem : JobComponentSystem
     }
     
     [BurstCompile]
-    private struct UpdateOvertaker : IJobForEach<OvertakerComponent, CarElementPositionComponent>
-    {
-        [ReadOnly] public NativeArray<CarBufferElement> CarElements;
-        
-        public void Execute(ref OvertakerComponent overtaker, [ReadOnly] ref CarElementPositionComponent carElementPosition)
-        {
-            var carIndex = carElementPosition.Value;
-            var nextCarIndex = (carIndex + 1) % CarElements.Length;
-            var carElement = CarElements[carIndex];
-            var nextCarElement = CarElements[nextCarIndex];
-            var distance = CarBufferElement.Distance(carElement, nextCarElement);
-            overtaker.DistanceToCarInFront = distance;
-            overtaker.CarInFrontSpeed = nextCarElement.Speed;
-        }
-    }
-    
-    [BurstCompile]
     private struct UpdateOvertakenIndexCars:  IJobForEach<CarElementPositionComponent>
     {
         [ReadOnly] public NativeArray<CarBufferElement> CarElements;
@@ -88,6 +71,29 @@ public class RaceSystem : JobComponentSystem
             var carElement = CarElements[currentIndex];
             
             carElementPosition.Value = carElement.newIndex;
+        }
+    }
+    
+    [BurstCompile]
+    private struct UpdateOvertaker : IJobForEach<OvertakerComponent, CarElementPositionComponent>
+    {
+        [ReadOnly] public NativeArray<CarBufferElement> CarElements;
+        
+        public void Execute(ref OvertakerComponent overtaker, [ReadOnly] ref CarElementPositionComponent carElementPosition)
+        {
+            var carIndex = carElementPosition.Value;
+            var carElement = CarElements[carIndex];
+
+            //distance to car in
+            for (int i = 0; i < CarElements.Length; i++)
+            {
+                
+            }
+            var nextCarIndex = (carIndex + 1) % CarElements.Length;
+            var nextCarElement = CarElements[nextCarIndex];
+            var distance = CarBufferElement.Distance(carElement, nextCarElement);
+            overtaker.DistanceToCarInFront = distance;
+            overtaker.CarInFrontSpeed = nextCarElement.Speed;
         }
     }
 

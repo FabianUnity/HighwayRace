@@ -8,17 +8,15 @@ public struct CarBufferElement : IBufferElementData, IComparable<CarBufferElemen
     
     public float Position;
     public float Speed;
-    /*public int Lane;
-    public int NextInLane;
+    public int Lane;
+    /*public int NextInLane;
     public int NextRight;
     public int NextLeft;
     public int PrevRight;
     public int PrevLeft;
     public int PrevLane;*/
-    public bool Dirty;
     public int newIndex;
     public int previousIndex;
-    //public Entity Entity;
 
     public static float Distance(CarBufferElement A, CarBufferElement B)
     {

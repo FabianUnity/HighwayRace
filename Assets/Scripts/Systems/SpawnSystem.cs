@@ -3,7 +3,6 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class SpawnSystem : MonoBehaviour
 {
@@ -12,41 +11,44 @@ public class SpawnSystem : MonoBehaviour
     [SerializeField] 
     private int carAmount;
     [SerializeField] 
+    private Highway highway;
+    [SerializeField] 
     private Color[] colors;
-
+    [SerializeField] 
+    private float landOffset = -1.7f;
+    [SerializeField] 
+    private float landSize = 1.7f;
+    
     private void Start()
-    {
-        CreateCars();
-    }
-
-    private void CreateCars()
     {
         Entity prefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(carPrefab, World.Active);
         var entityManager = World.Active.EntityManager;
         var carElementArray =
             new NativeArray<CarBufferElement>(carAmount, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
         
+        
+        Unity.Mathematics.Random random = new Unity.Mathematics.Random();
         float3 position = float3.zero;
         float distance = (2*math.PI) / carAmount;
-        float minRadius = 115f / 4f;
+        float minRadius = highway.Radius;
         float radius = 0;
         float angle = 0;
         int land;
 
         for (int i = 0; i < carAmount; i++)
         {
-            Random.InitState(((int) System.DateTime.Now.Ticks) * (i+1));
-            land = Random.Range(0,4);
-            radius = minRadius + (land * 1.7f);
+            random.InitState((uint)((System.DateTime.Now.Ticks) * (i+1)));
+            land = random.NextInt(0, 4);
+            radius = minRadius + (land * landSize) + landOffset;
             var instance = entityManager.Instantiate(prefab);
             position.x = radius * math.cos(angle);
             position.z = radius * math.sin(angle);
             entityManager.SetComponentData(instance, new Translation{Value = position});
             entityManager.AddComponentData(instance, new PositionComponent { Position = new float2(angle, radius) });
-            float speed = Random.Range(0.05f, 1f);
+            float speed = random.NextFloat(0.05f, 1f);
             entityManager.AddComponentData(instance, new SpeedComponent {CurrentSpeed = speed, DefaultSpeed = speed, OvertakeSpeed = 20, TargetSpeed = 15});
             entityManager.AddComponentData(instance, new CarElementPositionComponent(){Value = i});
-            entityManager.AddComponentData(instance, new OvertakerComponent{ CarInFrontSpeed = 0f, OvertakeDistance = Random.Range(0.05f, 0.1f) });
+            entityManager.AddComponentData(instance, new OvertakerComponent{ CarInFrontSpeed = 0.05f, OvertakeDistance = random.NextFloat(0.05f, 0.1f) });
 
             carElementArray[i] = new CarBufferElement()
             {
