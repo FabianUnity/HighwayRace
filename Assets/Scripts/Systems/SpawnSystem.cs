@@ -12,8 +12,14 @@ public class SpawnSystem : MonoBehaviour
     [SerializeField] 
     private int carAmount;
     [SerializeField] 
+    private Highway highway;
+    [SerializeField] 
     private Color[] colors;
-
+    [SerializeField] 
+    private float landOffset = -1.7f;
+    [SerializeField] 
+    private float landSize = 1.7f;
+    
     private void Start()
     {
         CreateCars();
@@ -28,7 +34,7 @@ public class SpawnSystem : MonoBehaviour
         
         float3 position = float3.zero;
         float distance = (2*math.PI) / carAmount;
-        float minRadius = 115f / 4f;
+        float minRadius = highway.Radius;
         float radius = 0;
         float angle = 0;
         int land;
@@ -37,7 +43,7 @@ public class SpawnSystem : MonoBehaviour
         {
             Random.InitState(((int) System.DateTime.Now.Ticks) * (i+1));
             land = Random.Range(0,4);
-            radius = minRadius + (land * 1.7f);
+            radius = minRadius + (land * landSize) + landOffset;
             var instance = entityManager.Instantiate(prefab);
             position.x = radius * math.cos(angle);
             position.z = radius * math.sin(angle);
