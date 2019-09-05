@@ -6,24 +6,24 @@ public struct CarBufferElement : IBufferElementData
     public const float _2PI = 2 * math.PI;
     
     public float Position;
-    public int Lane;
+    /*public int Lane;
     public int NextInLane;
     public int NextRight;
     public int NextLeft;
     public int PrevRight;
     public int PrevLeft;
-    public int PrevLane;
+    public int PrevLane;*/
     public bool Dirty;
     public int NewIndex;
-    public Entity Entity;
+    //public Entity Entity;
 
     public static float Distance(CarBufferElement A, CarBufferElement B)
     {
         var delta = LoopPosition(B.Position - A.Position);
-        if (delta > math.PI)
+        /*if (delta > math.PI)
         {
             delta -= _2PI;
-        }
+        }*/
 
         return delta;
     }

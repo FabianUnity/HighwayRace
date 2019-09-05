@@ -9,7 +9,6 @@ public class FrontSensorSystem : JobComponentSystem
     {
         public void Execute([ReadOnly] ref PositionComponent positionComponent, ref SpeedComponent speedComponent, [ReadOnly]ref OvertakerComponent overtakerComponent)
         {
-            Debug.Log("Distance: " + overtakerComponent.DistanceToCarInFront + " OvertakeDistance: " + overtakerComponent.OvertakeDistance);
             if (overtakerComponent.DistanceToCarInFront <= overtakerComponent.OvertakeDistance)
             {
                 speedComponent.TargetSpeed = overtakerComponent.CarInFrontSpeed;

@@ -339,7 +339,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   carPrefab: {fileID: 1999935204370666, guid: eb09540518ebb214aba8500b41634a1b, type: 3}
-  carAmount: 3
+  carAmount: 20
   colors:
   - {r: 0.068057805, g: 0.9433962, b: 0.06674972, a: 1}
   - {r: 0.8962264, g: 0.25328052, b: 0.063412234, a: 1}
