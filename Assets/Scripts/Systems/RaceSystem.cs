@@ -1,10 +1,13 @@
-﻿using Unity.Collections;
+﻿using Unity.Burst;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
 
 public class RaceSystem : JobComponentSystem
 {
-    //private BeginInitializationEntityCommandBufferSystem _entityCommandBufferSystem;
+    private BeginInitializationEntityCommandBufferSystem _entityCommandBufferSystem;
     private EntityQuery _highWayQuery;
     
     protected override void OnCreate()
@@ -12,9 +15,23 @@ public class RaceSystem : JobComponentSystem
         _highWayQuery = GetEntityQuery(typeof(HighWayComponent));
         
         //initialize command buffer
-        //_entityCommandBufferSystem = World.GetOrCreateSystem<BeginInitializationEntityCommandBufferSystem>();
+        _entityCommandBufferSystem = World.GetOrCreateSystem<BeginInitializationEntityCommandBufferSystem>();
+    }
+    
+    [BurstCompile]
+    private struct ExtractCarPositions : IJobForEach<CarElementPositionComponent,PositionComponent>
+    {
+        [NativeDisableParallelForRestriction] public NativeArray<CarBufferElement> CarElements;
+        
+        public void Execute([ReadOnly] ref CarElementPositionComponent carElementPosition, [ReadOnly] ref PositionComponent position)
+        {
+            var carElement = CarElements[carElementPosition.Value];
+            carElement.Position = position.Position.x;
+            CarElements[carElementPosition.Value] = carElement;
+        }
     }
 
+    [BurstCompile]
     private struct UpdatePositions : IJob
     {
         //public EntityCommandBuffer CommandBuffer;
@@ -27,11 +44,14 @@ public class RaceSystem : JobComponentSystem
             {
                 var carElement = CarElements[carIndex];
                 var nextCarIndex = (carIndex + 1) % CarElements.Length;
+                var referenceCarIndex = (carIndex + 2) % CarElements.Length;
                 var nextCarElement = CarElements[nextCarIndex];
-                var distance = CarBufferElement.Distance(nextCarElement, carElement);
+                var referenceCarElement = CarElements[referenceCarIndex];
+                var distanceToReference = CarBufferElement.Distance(carElement, referenceCarElement);
+                var distanceFromNextToReference = CarBufferElement.Distance(nextCarElement, referenceCarElement);
 
                 //if has overtaken
-                if (distance < 0)
+                if (distanceToReference < distanceFromNextToReference)
                 {
                     carElement.Dirty = true;
                     carElement.NewIndex = carIndex;
@@ -41,50 +61,41 @@ public class RaceSystem : JobComponentSystem
                     //switch the cars
                     CarElements[nextCarIndex] = carElement;
                     CarElements[carIndex] = nextCarElement;
-                    
-                    
-
-                    //mark the entities to update indexes
-                    /*if (switched[carIndex])
-                    {*/
-                        //CommandBuffer.SetComponent(carElement.Entity,
-                            //new HasOvertakenComponent() {NewPosition = nextCarIndex, hasToChange = true});
-                    /*}
-                    else
-                    {
-                        CommandBuffer.AddComponent(carElement.Entity,
-                            new HasOvertakenComponent() {NewPosition = nextCarIndex});
-                    }
-
-                    if (switched[nextCarIndex])
-                    {*/
-                    //Unity.Entities.World.Active.EntityManager.SetComponentData(nextCarElement.Entity,new HasOvertakenComponent() {NewPosition = carIndex, hasToChange = true});
-
-                        /*CommandBuffer.SetComponent(nextCarElement.Entity,
-                            new HasOvertakenComponent() {NewPosition = carIndex, hasToChange = true});
-                    /*}
-                    else
-                    {
-                        CommandBuffer.AddComponent(nextCarElement.Entity,
-                            new HasOvertakenComponent() {NewPosition = carIndex});
-                    }*/
-
-                    /*switched[nextCarIndex] = true;
-                    switched[carIndex] = true;*/
                 }
             }
         }
     }
     
-    private struct ExtractCarPositions : IJobForEach<CarElementPositionComponent,PositionComponent>
+    [BurstCompile]
+    private struct UpdateOvertakerDistances : IJobForEach<OvertakerComponent, CarElementPositionComponent>
+    {
+        [ReadOnly] public NativeArray<CarBufferElement> CarElements;
+        
+        public void Execute(ref OvertakerComponent overtaker, [ReadOnly] ref CarElementPositionComponent carElementPosition)
+        {
+            var carIndex = carElementPosition.Value;
+            var nextCarIndex = (carIndex + 1) % CarElements.Length;
+            var carElement = CarElements[carIndex];
+            var distance = CarBufferElement.Distance(carElement, CarElements[nextCarIndex]);
+            overtaker.DistanceToCarInFront = distance;
+        }
+    }
+    
+    [BurstCompile]
+    private struct UpdateOvertakenIndexCars:  IJobForEach<CarElementPositionComponent>
     {
         [NativeDisableParallelForRestriction] public NativeArray<CarBufferElement> CarElements;
-        
-        public void Execute([ReadOnly] ref CarElementPositionComponent carElementPosition, [ReadOnly] ref PositionComponent position)
+
+        public void Execute(ref CarElementPositionComponent carElementPosition)
         {
             var carElement = CarElements[carElementPosition.Value];
-            carElement.Position = position.Position.x;
+            
+            if (!carElement.Dirty) return;
+            
+            carElement.Dirty = false;
             CarElements[carElementPosition.Value] = carElement;
+            
+            carElementPosition.Value = carElement.NewIndex;
         }
     }
 
@@ -100,16 +111,23 @@ public class RaceSystem : JobComponentSystem
             CarElements = bufferArray
         }.Schedule(this,inputDeps);
                    
-        var updateJobHandle = new UpdatePositions()
+        var updatePositionsJobHandle = new UpdatePositions()
         {
-            //CommandBuffer = _entityCommandBufferSystem.CreateCommandBuffer(),
             CarElements = bufferArray
         }.Schedule(extractJobHandle);
         
-
-        //updateJobHandle.Complete();
+        var updateDistancesJobHandle = new UpdateOvertakerDistances()
+        {
+            CarElements = bufferArray
+        }.Schedule(this, updatePositionsJobHandle);
+        
+        var updateOvertakenJobHandle = new UpdateOvertakenIndexCars()
+        {
+            CarElements = bufferArray
+        }.Schedule(this, updateDistancesJobHandle);
+        
         //_entityCommandBufferSystem.AddJobHandleForProducer(updateJobHandle);
 
-        return updateJobHandle;
+        return updateOvertakenJobHandle;
     }
 }

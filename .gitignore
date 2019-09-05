@@ -6,6 +6,7 @@
 Assets/AssetStoreTools*
 
 .idea/
+*.DS_Store
 
 # Visual Studio cache directory
 .vs/

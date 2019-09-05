@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -6,6 +7,7 @@ using Unity.Transforms;
 
 public class PresentationSystem : JobComponentSystem
 {
+    [BurstCompile]
     struct PresentationJob : IJobForEach<Translation, PositionComponent, SpeedComponent>
     {
         public void Execute( ref Translation translation, [ReadOnly]ref PositionComponent positionComponent, [ReadOnly]ref SpeedComponent speedComponent)
