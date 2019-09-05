@@ -46,11 +46,13 @@ public class SpawnSystem : MonoBehaviour
             float speed = Random.Range(0.05f, 1f);
             entityManager.AddComponentData(instance, new SpeedComponent {CurrentSpeed = speed, DefaultSpeed = speed, OvertakeSpeed = 20, TargetSpeed = 15});
             entityManager.AddComponentData(instance, new CarElementPositionComponent(){Value = i});
-            entityManager.AddComponentData(instance, new OvertakerComponent{ CarInFrontSpeed = 0.05f, OvertakeDistance = Random.Range(0.05f, 0.1f) });
+            entityManager.AddComponentData(instance, new OvertakerComponent{ CarInFrontSpeed = 0f, OvertakeDistance = Random.Range(0.05f, 0.1f) });
 
             carElementArray[i] = new CarBufferElement()
             {
                 Position = 0,
+                previousIndex = i,
+                newIndex = i
                 /*Entity = instance,
                 NextInLane = -1,
                 NextLeft = -1,
