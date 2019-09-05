@@ -21,18 +21,20 @@ public class RaceSystem : JobComponentSystem
     }
     
     [BurstCompile]
-    private struct ExtractCarData : IJobForEach<CarElementPositionComponent,PositionComponent, SpeedComponent>
+    private struct ExtractCarData : IJobForEach<CarElementPositionComponent,PositionComponent, SpeedComponent, LaneComponent>
     {
         [NativeDisableParallelForRestriction] public NativeArray<CarBufferElement> CarElements;
         
         public void Execute(
             [ReadOnly] ref CarElementPositionComponent carElementPosition,
             [ReadOnly] ref PositionComponent position,
-            [ReadOnly] ref SpeedComponent speed)
+            [ReadOnly] ref SpeedComponent speed,
+            [ReadOnly] ref LaneComponent lane)
         {
             var carElement = CarElements[carElementPosition.Value];
             carElement.Position = position.Position.x;
             carElement.Speed = speed.CurrentSpeed;
+            carElement.Lane = lane.Lane;
             CarElements[carElementPosition.Value] = carElement;
         }
     }
@@ -84,16 +86,37 @@ public class RaceSystem : JobComponentSystem
             var carIndex = carElementPosition.Value;
             var carElement = CarElements[carIndex];
 
-            //distance to car in
-            for (int i = 0; i < CarElements.Length; i++)
+            // Car in front
+            var speed = CarBufferElement._2PI;
+            var distance = CarBufferElement._2PI;
+            for (int i = 1; i < CarElements.Length; i++)
             {
-                
+                var nextCar = CarElements[(carIndex + i) % CarElements.Length];
+                if (nextCar.Lane == carElement.Lane)
+                {
+                    distance = CarBufferElement.Distance(carElement, nextCar);
+                    speed = nextCar.Speed;
+                    break;
+                }
             }
-            var nextCarIndex = (carIndex + 1) % CarElements.Length;
-            var nextCarElement = CarElements[nextCarIndex];
-            var distance = CarBufferElement.Distance(carElement, nextCarElement);
             overtaker.DistanceToCarInFront = distance;
-            overtaker.CarInFrontSpeed = nextCarElement.Speed;
+            overtaker.CarInFrontSpeed = speed;
+            
+            // Car in right
+            speed = CarBufferElement._2PI;
+            distance = CarBufferElement._2PI;
+            for (int i = 1; i < CarElements.Length; i++)
+            {
+                var nextCar = CarElements[(carIndex + i) % CarElements.Length];
+                if (nextCar.Lane == carElement.Lane - 1)
+                {
+                    distance = CarBufferElement.Distance(carElement, nextCar);
+                    speed = nextCar.Speed;
+                    break;
+                }
+            }
+            overtaker.CanTurnRight = distance > 0.05f && carElement.Lane < 3;
+            overtaker.CarInRightSpeed = speed;
         }
     }
 
@@ -108,6 +131,8 @@ public class RaceSystem : JobComponentSystem
         {
             CarElements = bufferArray
         }.Schedule(this,inputDeps);
+
+        //var sortBufferJobHandle = bufferArray.SortJob(extractJobHandle);
                    
         var orderJobHandle = new UpdateOrder()
         {
