@@ -4,7 +4,7 @@ using Unity.Jobs;
 
 public class RaceSystem : JobComponentSystem
 {
-    private BeginInitializationEntityCommandBufferSystem _entityCommandBufferSystem;
+    //private BeginInitializationEntityCommandBufferSystem _entityCommandBufferSystem;
     private EntityQuery _highWayQuery;
     
     protected override void OnCreate()
@@ -12,17 +12,17 @@ public class RaceSystem : JobComponentSystem
         _highWayQuery = GetEntityQuery(typeof(HighWayComponent));
         
         //initialize command buffer
-        _entityCommandBufferSystem = World.GetOrCreateSystem<BeginInitializationEntityCommandBufferSystem>();
+        //_entityCommandBufferSystem = World.GetOrCreateSystem<BeginInitializationEntityCommandBufferSystem>();
     }
 
     private struct UpdatePositions : IJob
     {
-        public EntityCommandBuffer CommandBuffer;
+        //public EntityCommandBuffer CommandBuffer;
         public NativeArray<CarBufferElement> CarElements;
        
         public void Execute()
         {
-            var switched = new NativeArray<bool>(CarElements.Length,Allocator.Temp);
+            //var switched = new NativeArray<bool>(CarElements.Length,Allocator.Temp);
             for (var carIndex = 0; carIndex < CarElements.Length; carIndex++)
             {
                 var carElement = CarElements[carIndex];
@@ -33,16 +33,23 @@ public class RaceSystem : JobComponentSystem
                 //if has overtaken
                 if (distance < 0)
                 {
+                    carElement.Dirty = true;
+                    carElement.NewIndex = carIndex;
+                    nextCarElement.Dirty = true;
+                    nextCarElement.NewIndex = nextCarIndex;
+                    
                     //switch the cars
                     CarElements[nextCarIndex] = carElement;
                     CarElements[carIndex] = nextCarElement;
+                    
+                    
 
                     //mark the entities to update indexes
-                    if (switched[carIndex])
-                    {
-                        CommandBuffer.SetComponent(carElement.Entity,
-                            new HasOvertakenComponent() {NewPosition = nextCarIndex});
-                    }
+                    /*if (switched[carIndex])
+                    {*/
+                        //CommandBuffer.SetComponent(carElement.Entity,
+                            //new HasOvertakenComponent() {NewPosition = nextCarIndex, hasToChange = true});
+                    /*}
                     else
                     {
                         CommandBuffer.AddComponent(carElement.Entity,
@@ -50,18 +57,20 @@ public class RaceSystem : JobComponentSystem
                     }
 
                     if (switched[nextCarIndex])
-                    {
-                        CommandBuffer.SetComponent(nextCarElement.Entity,
-                            new HasOvertakenComponent() {NewPosition = carIndex});
-                    }
+                    {*/
+                    //Unity.Entities.World.Active.EntityManager.SetComponentData(nextCarElement.Entity,new HasOvertakenComponent() {NewPosition = carIndex, hasToChange = true});
+
+                        /*CommandBuffer.SetComponent(nextCarElement.Entity,
+                            new HasOvertakenComponent() {NewPosition = carIndex, hasToChange = true});
+                    /*}
                     else
                     {
                         CommandBuffer.AddComponent(nextCarElement.Entity,
                             new HasOvertakenComponent() {NewPosition = carIndex});
-                    }
+                    }*/
 
-                    switched[nextCarIndex] = true;
-                    switched[carIndex] = true;
+                    /*switched[nextCarIndex] = true;
+                    switched[carIndex] = true;*/
                 }
             }
         }
@@ -93,13 +102,14 @@ public class RaceSystem : JobComponentSystem
                    
         var updateJobHandle = new UpdatePositions()
         {
-            CommandBuffer = _entityCommandBufferSystem.CreateCommandBuffer(),
+            //CommandBuffer = _entityCommandBufferSystem.CreateCommandBuffer(),
             CarElements = bufferArray
         }.Schedule(extractJobHandle);
+        
 
         //updateJobHandle.Complete();
-        _entityCommandBufferSystem.AddJobHandleForProducer(updateJobHandle);
-        
+        //_entityCommandBufferSystem.AddJobHandleForProducer(updateJobHandle);
+
         return updateJobHandle;
     }
 }

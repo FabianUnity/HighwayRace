@@ -13,6 +13,8 @@ public struct CarBufferElement : IBufferElementData
     public int PrevRight;
     public int PrevLeft;
     public int PrevLane;
+    public bool Dirty;
+    public int NewIndex;
     public Entity Entity;
 
     public static float Distance(CarBufferElement A, CarBufferElement B)

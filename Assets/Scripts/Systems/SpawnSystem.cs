@@ -43,9 +43,10 @@ public class SpawnSystem : MonoBehaviour
             position.z = radius * math.sin(angle);
             entityManager.SetComponentData(instance, new Translation{Value = position});
             entityManager.AddComponentData(instance, new PositionComponent { Position = new float2(angle, radius) });
-            entityManager.AddComponentData(instance, new SpeedComponent {CurrentSpeed = Random.Range(0.007f,0.07f), DefaultSpeed = 15, OvertakeSpeed = 20, TargetSpeed = 15});
+            entityManager.AddComponentData(instance, new SpeedComponent {CurrentSpeed = Random.Range(0.007f,0.009f), DefaultSpeed = 15, OvertakeSpeed = 20, TargetSpeed = 15});
             entityManager.AddComponentData(instance, new CarElementPositionComponent(){Value = i});
             entityManager.AddComponentData(instance, new OvertakerComponent());
+            entityManager.AddComponentData(instance, new HasOvertakenComponent(){NewPosition = -1, hasToChange = false});
             
             carElementArray[i] = new CarBufferElement()
             {
