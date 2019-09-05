@@ -83,6 +83,8 @@ public class RaceSystem : JobComponentSystem
         
         public void Execute(ref OvertakerComponent overtaker, [ReadOnly] ref CarElementPositionComponent carElementPosition)
         {
+            //TODO: Improve this sh*t
+            
             var carIndex = carElementPosition.Value;
             var carElement = CarElements[carIndex];
 
@@ -115,8 +117,24 @@ public class RaceSystem : JobComponentSystem
                     break;
                 }
             }
-            overtaker.CanTurnRight = distance > 0.05f && carElement.Lane < 3;
+            overtaker.CanTurnRight = distance > 0.05f && carElement.Lane > 0;
             overtaker.CarInRightSpeed = speed;
+            
+            // Car in left
+            speed = CarBufferElement._2PI;
+            distance = CarBufferElement._2PI;
+            for (int i = 1; i < CarElements.Length; i++)
+            {
+                var nextCar = CarElements[(carIndex + i) % CarElements.Length];
+                if (nextCar.Lane == carElement.Lane + 1)
+                {
+                    distance = CarBufferElement.Distance(carElement, nextCar);
+                    speed = nextCar.Speed;
+                    break;
+                }
+            }
+            overtaker.CanTurnLeft = distance > 0.05f && carElement.Lane < 3;
+            //overtaker.CarInLeftSpeed = speed;
         }
     }
 
