@@ -12,22 +12,24 @@ public class SideSensorSystem : JobComponentSystem
     {
         public void Execute([ReadOnly]ref PositionComponent positionComponent, ref LaneComponent laneComponent, ref OvertakerComponent overtakerComponent, [ReadOnly] ref SpeedComponent speedComponent, ref LaneChangeComponent laneChangeComponent, ref OvertakingComponent overtakingComponent)
         {
-            if(laneChangeComponent.LastLane != laneComponent.Lane && overtakingComponent.TimeLeft <= 0)
+            if(laneChangeComponent.LastLane != laneComponent.Lane && overtakingComponent.TimeLeft > 0)
                 return;
 
-            if (laneComponent.Lane > 0 && (0.1f > overtakerComponent.DistanceToCarInRight ||
-                                           (0.1f <= overtakerComponent.DistanceToCarInRight &&
+            
+           
+            
+            if (laneComponent.Lane > 0 && (0.1f < overtakerComponent.DistanceToCarInRight ||
+                                           (0.1f >= overtakerComponent.DistanceToCarInRight &&
                                             overtakerComponent.CarInRightSpeed >= speedComponent.DefaultSpeed)))
             {
-
                 laneChangeComponent.LastLane = laneComponent.Lane;
                 laneChangeComponent.CurrentTime = 0;
                 laneComponent.Lane -= 1;
                 return;
             }
 
-            if (laneChangeComponent.IsWantToOvertake && laneComponent.Lane < 3 && (0.1f > overtakerComponent.DistanceToCarInLeft ||
-                                                                                   (0.1f <= overtakerComponent.DistanceToCarInLeft &&
+            if (laneChangeComponent.IsWantToOvertake && laneComponent.Lane < 3 && (0.1f < overtakerComponent.DistanceToCarInLeft ||
+                                                                                   (0.1f >= overtakerComponent.DistanceToCarInLeft &&
                                                                                    overtakerComponent.CarInLeftSpeed >= speedComponent.OvertakeSpeed)))
             {
                 laneChangeComponent.LastLane = laneComponent.Lane;
@@ -35,8 +37,10 @@ public class SideSensorSystem : JobComponentSystem
                 laneComponent.Lane += 1;
                 
                 //set time to overtake
-                //overtakerComponent.Blocked = false;
-                //overtakingComponent.TimeLeft = 4;//math.min(2,(overtakerComponent.DistanceToCarInFront) / (overtakerComponent.CarInFrontSpeed - speedComponent.OvertakeSpeed) + 1);
+
+                overtakerComponent.Blocked = false;
+                overtakingComponent.TimeLeft = math.min(2,(overtakerComponent.DistanceToCarInFront) / (overtakerComponent.CarInFrontSpeed - speedComponent.OvertakeSpeed) + 1);
+
             }
         }
     }

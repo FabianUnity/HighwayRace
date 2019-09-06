@@ -3,6 +3,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class FrontSensorSystem : JobComponentSystem
@@ -18,7 +19,8 @@ public class FrontSensorSystem : JobComponentSystem
                 return;
             if (overtakerComponent.DistanceToCarInFront < overtakerComponent.OvertakeDistance)
             {
-                speedComponent.TargetSpeed = overtakerComponent.CarInFrontSpeed;
+                var targetSpeed = math.min(speedComponent.DefaultSpeed, overtakerComponent.CarInFrontSpeed);
+                speedComponent.TargetSpeed = targetSpeed;
                 overtakerComponent.Blocked = true;
                 if (overtakerComponent.OvertakeEargerness >= overtakerComponent.CarInFrontSpeed / speedComponent.DefaultSpeed)
                     laneChangeComponent.IsWantToOvertake = true;
