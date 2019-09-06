@@ -121,7 +121,7 @@ public class RaceSystem : JobComponentSystem
                 }
             }
 
-            overtaker.CanTurnRight = distance > 0.05f && carElement.Lane > 0;
+            overtaker.DistanceToCarInRight = distance;
             overtaker.CarInRightSpeed = speed;
             
             // Car in left
@@ -141,7 +141,7 @@ public class RaceSystem : JobComponentSystem
                 }
             }
 
-            overtaker.CanTurnLeft = distance > 0.05f && carElement.Lane < 3;
+            overtaker.DistanceToCarInLeft = distance;
             //overtaker.CarInLeftSpeed = speed;
         }
     }
