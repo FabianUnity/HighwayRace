@@ -49,7 +49,7 @@ public class SpawnSystem : MonoBehaviour
         for (int i = 0; i < carAmount; i++)
         {
             random.InitState((uint)((System.DateTime.Now.Ticks) * (i+1)));
-            lane = 0;//random.NextInt(0, 4);
+            lane = random.NextInt(0, 4);
             radius = laneRadius[lane];
             var instance = entityManager.Instantiate(prefab);
             position.x = radius * math.cos(angle);

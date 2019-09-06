@@ -8,22 +8,19 @@ public class LaneChangeSystem : JobComponentSystem
 {
     private const float DURATION = 0.3f;
     
-    private BeginInitializationEntityCommandBufferSystem entityCommandBufferSystem;
     private EntityQuery _highWayQuery;
     
     protected override void OnCreate()
     {
         _highWayQuery = GetEntityQuery(typeof(HighWayComponent));
-        entityCommandBufferSystem = World.GetOrCreateSystem<BeginInitializationEntityCommandBufferSystem>();
     }
     
-    struct ChangeLaneJob : IJobForEachWithEntity<PositionComponent, LaneComponent, LaneChangeComponent>
+    struct ChangeLaneJob : IJobForEach<PositionComponent, LaneComponent, LaneChangeComponent>
     {
-        public EntityCommandBuffer.Concurrent CommandBuffer;
         public float4 LaneRadius;
         public float DeltaTime;
 
-        public void Execute(Entity entity, int index, ref PositionComponent positionComponent,[ReadOnly] ref LaneComponent laneComponent, ref LaneChangeComponent laneChangeComponent)
+        public void Execute(ref PositionComponent positionComponent,[ReadOnly] ref LaneComponent laneComponent, ref LaneChangeComponent laneChangeComponent)
         {
             if(laneComponent.Lane == laneChangeComponent.LastLane)
                 return;
@@ -51,12 +48,9 @@ public class LaneChangeSystem : JobComponentSystem
         
         var job = new ChangeLaneJob
         {
-            CommandBuffer = entityCommandBufferSystem.CreateCommandBuffer().ToConcurrent(),
             LaneRadius = highWayComponent.LaneRadius,
             DeltaTime = Time.deltaTime
         }.Schedule(this, inputDeps);
-        
-        entityCommandBufferSystem.AddJobHandleForProducer(job);
 
         return job;
     }
