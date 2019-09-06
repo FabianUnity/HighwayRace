@@ -25,14 +25,17 @@ public class LaneChangeSystem : JobComponentSystem
 
         public void Execute(Entity entity, int index, ref PositionComponent positionComponent,[ReadOnly] ref LaneComponent laneComponent, ref LaneChangeComponent laneChangeComponent)
         {
+            if(laneComponent.Lane == laneChangeComponent.LastLane)
+                return;
+            
             laneChangeComponent.CurrentTime += DeltaTime;
 
             if (laneChangeComponent.CurrentTime >= DURATION)
             {
                 positionComponent.Position.y = LaneRadius[laneComponent.Lane];
-                CommandBuffer.RemoveComponent(index, entity, typeof(LaneChangeComponent));
-                if(laneComponent.Lane > laneChangeComponent.LastLane)
-                    CommandBuffer.RemoveComponent(index, entity, typeof(WantToOvertakeTag));
+                if (laneComponent.Lane > laneChangeComponent.LastLane)
+                    laneChangeComponent.IsWantToOvertake = false;
+                laneChangeComponent.LastLane = laneComponent.Lane;
                 return;
             }
             

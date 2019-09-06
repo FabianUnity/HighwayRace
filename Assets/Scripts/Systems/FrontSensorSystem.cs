@@ -12,19 +12,21 @@ public class FrontSensorSystem : JobComponentSystem
         entityCommandBufferSystem = World.GetOrCreateSystem<BeginInitializationEntityCommandBufferSystem>();
     }
     
-    [ExcludeComponent(typeof(WantToOvertakeTag))]
-    struct FrontSensorJob : IJobForEachWithEntity<PositionComponent, SpeedComponent, OvertakerComponent>
+    struct FrontSensorJob : IJobForEachWithEntity<PositionComponent, SpeedComponent, OvertakerComponent, LaneChangeComponent>
     {
         public EntityCommandBuffer.Concurrent CommandBuffer;
 
-        public void Execute(Entity entity, int index, [ReadOnly] ref PositionComponent positionComponent, ref SpeedComponent speedComponent, [ReadOnly]ref OvertakerComponent overtakerComponent)
+        public void Execute(Entity entity, int index, [ReadOnly] ref PositionComponent positionComponent, ref SpeedComponent speedComponent, [ReadOnly]ref OvertakerComponent overtakerComponent, ref LaneChangeComponent laneChangeComponent)
         {
+            if(laneChangeComponent.IsWantToOvertake)
+                return;
             if (overtakerComponent.DistanceToCarInFront < overtakerComponent.OvertakeDistance)
             {
                 speedComponent.TargetSpeed = overtakerComponent.CarInFrontSpeed;
                 speedComponent.CurrentSpeed = overtakerComponent.CarInFrontSpeed;
-                if (overtakerComponent.OvertakeEargerness > overtakerComponent.CarInFrontSpeed/speedComponent.DefaultSpeed)
-                    CommandBuffer.AddComponent(index, entity, new WantToOvertakeTag());
+                if (overtakerComponent.OvertakeEargerness >
+                    overtakerComponent.CarInFrontSpeed / speedComponent.DefaultSpeed)
+                    laneChangeComponent.IsWantToOvertake = true;
             }
             else
             {

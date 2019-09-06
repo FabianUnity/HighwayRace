@@ -53,6 +53,7 @@ public class SpawnSystem : MonoBehaviour
             entityManager.AddComponentData(instance, new CarElementPositionComponent(){Value = i});
             entityManager.AddComponentData(instance, new OvertakerComponent{ CarInFrontSpeed = speed, OvertakeDistance = random.NextFloat(0.05f, 0.1f), OvertakeEargerness = random.NextFloat(0.7f,2f)});
             entityManager.AddComponentData(instance, new LaneComponent { Lane = lane });
+            entityManager.AddComponentData(instance, new LaneChangeComponent { LastLane = lane, IsWantToOvertake = false });
             entityManager.AddComponentData(instance, new ColorComponent { Value = 1 });
             carElementArray[i] = new CarBufferElement()
             {
