@@ -27,6 +27,7 @@ public class FrontSensorSystem : JobComponentSystem
             {
                 speedComponent.TargetSpeed = speedComponent.DefaultSpeed;
                 overtakerComponent.Blocked = false;
+                laneChangeComponent.IsWantToOvertake = false;
             }
         }
     }
