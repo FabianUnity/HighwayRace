@@ -22,7 +22,7 @@ public class FrontSensorSystem : JobComponentSystem
                 var targetSpeed = math.min(speedComponent.DefaultSpeed, overtakerComponent.CarInFrontSpeed);
                 speedComponent.TargetSpeed = targetSpeed;
                 overtakerComponent.Blocked = true;
-                if (overtakerComponent.OvertakeEargerness >= overtakerComponent.CarInFrontSpeed / speedComponent.DefaultSpeed)
+                if (overtakerComponent.OvertakeEargerness > overtakerComponent.CarInFrontSpeed / speedComponent.DefaultSpeed)
                     laneChangeComponent.IsWantToOvertake = true;
             }
             else

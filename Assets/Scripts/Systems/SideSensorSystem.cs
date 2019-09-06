@@ -8,29 +8,36 @@ using Random = Unity.Mathematics.Random;
 
 public class SideSensorSystem : JobComponentSystem
 {
+    public const float BACK_DISTANCE = 0.3f;
+    public const float SIDE_DISTANCE = 0.2f;
+    
+    
     struct RightSensorJob : IJobForEach<PositionComponent, LaneComponent, OvertakerComponent, SpeedComponent, LaneChangeComponent, OvertakingComponent>
     {
         public void Execute([ReadOnly]ref PositionComponent positionComponent, ref LaneComponent laneComponent, ref OvertakerComponent overtakerComponent, [ReadOnly] ref SpeedComponent speedComponent, ref LaneChangeComponent laneChangeComponent, ref OvertakingComponent overtakingComponent)
         {
             if(laneChangeComponent.LastLane != laneComponent.Lane && overtakingComponent.TimeLeft > 0)
                 return;
+
+            bool eargerness = overtakerComponent.OvertakeEargerness <=
+                               overtakerComponent.CarInRightSpeed / speedComponent.DefaultSpeed;
             
             if (laneComponent.Lane > 0 && 
-                (0.1f < overtakerComponent.DistanceToCarInRight || overtakerComponent.CarInRightSpeed >= speedComponent.DefaultSpeed) &&
-                overtakerComponent.DistanceToCarInRightBack > 0.3f)
+                (SIDE_DISTANCE < overtakerComponent.DistanceToCarInRight && eargerness) &&
+                overtakerComponent.DistanceToCarInRightBack >= BACK_DISTANCE)
             {
-                laneChangeComponent.LastLane = laneComponent.Lane;
                 laneChangeComponent.CurrentTime = 0;
+                laneChangeComponent.LastLane = laneComponent.Lane;
                 laneComponent.Lane -= 1;
                 return;
             }
 
             if (laneChangeComponent.IsWantToOvertake && laneComponent.Lane < 3 && 
-                (0.1f < overtakerComponent.DistanceToCarInLeft || overtakerComponent.CarInLeftSpeed >= speedComponent.OvertakeSpeed)&&
-                overtakerComponent.DistanceToCarInLeftBack > 0.3f)
+                (SIDE_DISTANCE < overtakerComponent.DistanceToCarInLeft || overtakerComponent.CarInLeftSpeed >= speedComponent.OvertakeSpeed)&&
+                overtakerComponent.DistanceToCarInLeftBack >= BACK_DISTANCE)
             {
-                laneChangeComponent.LastLane = laneComponent.Lane;
                 laneChangeComponent.CurrentTime = 0;
+                laneChangeComponent.LastLane = laneComponent.Lane;
                 laneComponent.Lane += 1;
                 
                 //set time to overtake

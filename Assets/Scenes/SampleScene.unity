@@ -351,14 +351,14 @@ MonoBehaviour:
     x: 0.08
     y: 0.4
   rangeOvertakeDistance:
-    x: 0.04
-    y: 0.06
+    x: 0.05
+    y: 0.08
   rangeOvertakeSpeed:
     x: 0.1
-    y: 0.1
+    y: 0.2
   rangeOvertakeEargerness:
-    x: 0.7
-    y: 2
+    x: 0.1
+    y: 1
 --- !u!114 &974169070
 MonoBehaviour:
   m_ObjectHideFlags: 0
