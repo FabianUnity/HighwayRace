@@ -19,6 +19,14 @@ public class SpawnSystem : MonoBehaviour
     private float landOffset = -1.7f;
     [SerializeField] 
     private float landSize = 1.7f;
+    [SerializeField] 
+    private float2 rangeSpeed;
+    [SerializeField] 
+    private float2 rangeOvertakeDistance;
+    [SerializeField] 
+    private float2 rangeOvertakeSpeed;
+    [SerializeField] 
+    private float2 rangeOvertakeEargerness;
     
     private void Start()
     {
@@ -48,10 +56,10 @@ public class SpawnSystem : MonoBehaviour
             position.z = radius * math.sin(angle);
             entityManager.SetComponentData(instance, new Translation{Value = position});
             entityManager.AddComponentData(instance, new PositionComponent { Position = new float2(angle, radius) });
-            float speed = random.NextFloat(0.05f, 1f);
-            entityManager.AddComponentData(instance, new SpeedComponent {CurrentSpeed = speed, DefaultSpeed = speed, OvertakeSpeed = 20, TargetSpeed = 15});
+            float speed = random.NextFloat(rangeSpeed.x, rangeSpeed.y);
+            entityManager.AddComponentData(instance, new SpeedComponent {CurrentSpeed = speed, DefaultSpeed = speed, OvertakeSpeed = random.NextFloat(rangeOvertakeSpeed.x, rangeOvertakeSpeed.y), TargetSpeed = speed});
             entityManager.AddComponentData(instance, new CarElementPositionComponent(){Value = i});
-            entityManager.AddComponentData(instance, new OvertakerComponent{ CarInFrontSpeed = speed, OvertakeDistance = random.NextFloat(0.05f, 0.1f), OvertakeEargerness = random.NextFloat(0.7f,2f)});
+            entityManager.AddComponentData(instance, new OvertakerComponent{ CarInFrontSpeed = speed, OvertakeDistance = random.NextFloat(rangeOvertakeDistance.x, rangeOvertakeDistance.y), OvertakeEargerness = random.NextFloat(rangeOvertakeEargerness.x, rangeOvertakeEargerness.y)});
             entityManager.AddComponentData(instance, new LaneComponent { Lane = lane });
             entityManager.AddComponentData(instance, new LaneChangeComponent { LastLane = lane, IsWantToOvertake = false });
             entityManager.AddComponentData(instance, new ColorComponent { Value = 1 });
