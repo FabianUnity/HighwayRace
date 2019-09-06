@@ -5,15 +5,26 @@ using Unity.Jobs;
 
 public class FrontSensorSystem : JobComponentSystem
 {
-    [BurstCompile]
-    struct FronSensorJob : IJobForEach<PositionComponent, SpeedComponent, OvertakerComponent>
+    private BeginInitializationEntityCommandBufferSystem entityCommandBufferSystem;
+    
+    protected override void OnCreate()
     {
-        public void Execute([ReadOnly] ref PositionComponent positionComponent, ref SpeedComponent speedComponent, [ReadOnly]ref OvertakerComponent overtakerComponent)
+        entityCommandBufferSystem = World.GetOrCreateSystem<BeginInitializationEntityCommandBufferSystem>();
+    }
+    
+    [ExcludeComponent(typeof(WantToOvertakeTag))]
+    struct FrontSensorJob : IJobForEachWithEntity<PositionComponent, SpeedComponent, OvertakerComponent>
+    {
+        public EntityCommandBuffer.Concurrent CommandBuffer;
+
+        public void Execute(Entity entity, int index, [ReadOnly] ref PositionComponent positionComponent, ref SpeedComponent speedComponent, [ReadOnly]ref OvertakerComponent overtakerComponent)
         {
             if (overtakerComponent.DistanceToCarInFront < overtakerComponent.OvertakeDistance)
             {
                 speedComponent.TargetSpeed = overtakerComponent.CarInFrontSpeed;
                 speedComponent.CurrentSpeed = overtakerComponent.CarInFrontSpeed;
+                if (overtakerComponent.OvertakeEargerness > overtakerComponent.CarInFrontSpeed/speedComponent.DefaultSpeed)
+                    CommandBuffer.AddComponent(index, entity, new WantToOvertakeTag());
             }
             else
             {
@@ -22,10 +33,16 @@ public class FrontSensorSystem : JobComponentSystem
             }
         }
     }
-
+    
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
-        var job = new FronSensorJob();
-        return job.Schedule(this,inputDeps);
+        var job = new FrontSensorJob
+        {
+            CommandBuffer = entityCommandBufferSystem.CreateCommandBuffer().ToConcurrent(),
+        }.Schedule(this, inputDeps);
+
+        entityCommandBufferSystem.AddJobHandleForProducer(job);
+
+        return job;
     }
 }

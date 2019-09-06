@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class LaneChangeSystem : JobComponentSystem
 {
-    private const float DURATION = 0.5f;
+    private const float DURATION = 0.3f;
     
     private BeginInitializationEntityCommandBufferSystem entityCommandBufferSystem;
     private EntityQuery _highWayQuery;
@@ -31,6 +31,8 @@ public class LaneChangeSystem : JobComponentSystem
             {
                 positionComponent.Position.y = LaneRadius[laneComponent.Lane];
                 CommandBuffer.RemoveComponent(index, entity, typeof(LaneChangeComponent));
+                if(laneComponent.Lane > laneChangeComponent.LastLane)
+                    CommandBuffer.RemoveComponent(index, entity, typeof(WantToOvertakeTag));
                 return;
             }
             
