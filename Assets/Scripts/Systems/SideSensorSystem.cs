@@ -49,7 +49,7 @@ public class SideSensorSystem : JobComponentSystem
                 
                 //set time to overtake
                 overtakerComponent.Blocked = false;
-                overtakingComponent.TimeLeft = math.min(2,(overtakerComponent.DistanceToCarInFront) / (overtakerComponent.CarInFrontSpeed - speedComponent.OvertakeSpeed) + 1);
+                overtakingComponent.TimeLeft = math.min(2,(-overtakerComponent.DistanceToCarInFront) / (overtakerComponent.CarInFrontSpeed - speedComponent.OvertakeSpeed) + 1);
             }
         }
     }
