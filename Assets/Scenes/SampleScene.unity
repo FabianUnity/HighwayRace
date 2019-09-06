@@ -339,7 +339,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   carPrefab: {fileID: 1999935204370666, guid: eb09540518ebb214aba8500b41634a1b, type: 3}
-  carAmount: 2
+  carAmount: 10
   highway: {fileID: 974169070}
   colors:
   - {r: 0.068057805, g: 0.9433962, b: 0.06674972, a: 1}
@@ -347,6 +347,18 @@ MonoBehaviour:
   - {r: 0.9245283, g: 0.030526895, b: 0.8001292, a: 1}
   landOffset: -3
   landSize: 2
+  rangeSpeed:
+    x: 0.08
+    y: 0.4
+  rangeOvertakeDistance:
+    x: 0.5
+    y: 1
+  rangeOvertakeSpeed:
+    x: 0.05
+    y: 0.1
+  rangeOvertakeEargerness:
+    x: 0.5
+    y: 2
 --- !u!114 &974169070
 MonoBehaviour:
   m_ObjectHideFlags: 0

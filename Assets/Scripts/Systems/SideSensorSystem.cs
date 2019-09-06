@@ -2,6 +2,7 @@
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
 using Random = Unity.Mathematics.Random;
 
@@ -48,8 +49,7 @@ public class SideSensorSystem : JobComponentSystem
                 
                 //set time to overtake
                 overtakerComponent.Blocked = false;
-                overtakingComponent.TimeLeft = 3;//(overtakerComponent.DistanceToCarInFront) /
-                                               //(overtakerComponent.CarInFrontSpeed - speedComponent.OvertakeSpeed) + 1;
+                overtakingComponent.TimeLeft = math.min(2,(overtakerComponent.DistanceToCarInFront) / (overtakerComponent.CarInFrontSpeed - speedComponent.OvertakeSpeed) + 1);
             }
         }
     }

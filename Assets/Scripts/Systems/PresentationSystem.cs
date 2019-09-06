@@ -40,7 +40,7 @@ public class PresentationSystem : JobComponentSystem
             var maxSpeed = speedComponent.OvertakeSpeed;
             var defaultSpeed = speedComponent.DefaultSpeed;
             var s = 0.1f + 0.9f * (speed-defaultSpeed) / (maxSpeed-defaultSpeed);
-            var color = (int) math.clamp(math.floor(s * 10),0,10);
+            var color = (int) math.clamp(math.floor(s * 10),0,9);
             var previousColor = colorComponent.Value;
             if (color != previousColor)
             {

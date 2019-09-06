@@ -32,7 +32,6 @@ public class OvertakeSystem : JobComponentSystem
             {
                 speed.TargetSpeed = speed.OvertakeSpeed;
                 speed.CurrentSpeed = speed.TargetSpeed;
-                Debug.Log("accelerating");
             }
         }
     }
