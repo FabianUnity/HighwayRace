@@ -107,11 +107,17 @@ public class RaceSystem : JobComponentSystem
             // Car in right
             speed = CarBufferElement._2PI;
             distance = CarBufferElement._2PI;
+            var prevDistance = CarBufferElement._2PI;
             if (carElement.Lane > 0)
             {
                 for (int i = 1; i < CarElements.Length; i++)
                 {
                     var nextCar = CarElements[(carIndex + i) % CarElements.Length];
+                    var prevCar = CarElements[(CarElements.Length + carIndex - i) % CarElements.Length];
+                    if (prevCar.Lane == carElement.Lane - 1 && prevDistance>=CarBufferElement._2PI)
+                    {
+                        prevDistance = CarBufferElement.Distance(prevCar, carElement);
+                    }
                     if (nextCar.Lane == carElement.Lane - 1)
                     {
                         distance = CarBufferElement.Distance(carElement, nextCar);
@@ -122,16 +128,23 @@ public class RaceSystem : JobComponentSystem
             }
 
             overtaker.DistanceToCarInRight = distance;
+            overtaker.DistanceToCarInRightBack = prevDistance;
             overtaker.CarInRightSpeed = speed;
             
             // Car in left
             speed = CarBufferElement._2PI;
             distance = CarBufferElement._2PI;
+            prevDistance = CarBufferElement._2PI;
             if (carElement.Lane < 3)
             {
                 for (int i = 1; i < CarElements.Length; i++)
                 {
                     var nextCar = CarElements[(carIndex + i) % CarElements.Length];
+                    var prevCar = CarElements[(CarElements.Length + carIndex - i) % CarElements.Length];
+                    if (prevCar.Lane == carElement.Lane + 1 && prevDistance>=CarBufferElement._2PI)
+                    {
+                        prevDistance = CarBufferElement.Distance(prevCar, carElement);
+                    }
                     if (nextCar.Lane == carElement.Lane + 1)
                     {
                         distance = CarBufferElement.Distance(carElement, nextCar);
@@ -142,6 +155,7 @@ public class RaceSystem : JobComponentSystem
             }
 
             overtaker.DistanceToCarInLeft = distance;
+            overtaker.DistanceToCarInLeftBack = prevDistance;
             overtaker.CarInLeftSpeed = speed;
         }
     }

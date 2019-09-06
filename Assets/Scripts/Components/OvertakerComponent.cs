@@ -6,6 +6,8 @@ public struct OvertakerComponent : IComponentData
     public float DistanceToCarInFront;
     public float DistanceToCarInRight;
     public float DistanceToCarInLeft;
+    public float DistanceToCarInRightBack;
+    public float DistanceToCarInLeftBack;
     public float OvertakeDistance;
     public float CarInFrontSpeed;
     public float CarInRightSpeed;
