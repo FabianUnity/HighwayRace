@@ -142,7 +142,7 @@ public class RaceSystem : JobComponentSystem
             }
 
             overtaker.DistanceToCarInLeft = distance;
-            //overtaker.CarInLeftSpeed = speed;
+            overtaker.CarInLeftSpeed = speed;
         }
     }
 
