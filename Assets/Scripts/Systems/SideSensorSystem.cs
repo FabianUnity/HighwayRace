@@ -13,18 +13,24 @@ public class SideSensorSystem : JobComponentSystem
     }
     
     [ExcludeComponent(typeof(LaneChangeComponent))]
-    struct RightSensorJob : IJobForEachWithEntity<PositionComponent, LaneComponent, OvertakerComponent>
+    struct RightSensorJob : IJobForEachWithEntity<PositionComponent, LaneComponent, OvertakerComponent, SpeedComponent>
     {
         public EntityCommandBuffer.Concurrent CommandBuffer;
 
-        public void Execute(Entity entity, int index, [ReadOnly]ref PositionComponent positionComponent, ref LaneComponent laneComponent, [ReadOnly] ref OvertakerComponent overtakerComponent)
+        public void Execute(Entity entity, int index, [ReadOnly]ref PositionComponent positionComponent, ref LaneComponent laneComponent, [ReadOnly] ref OvertakerComponent overtakerComponent, [ReadOnly] ref SpeedComponent speedComponent)
         {
-            Random random = new Random();
-            random.InitState((uint)((System.DateTime.Now.Ticks) * (index+1)));
-            if (overtakerComponent.CanTurnRight && random.NextFloat(0, 100) >= 90 )
+            if (laneComponent.Lane > 0 && (overtakerComponent.OvertakeDistance >= overtakerComponent.DistanceToCarInRight ||
+                                           (overtakerComponent.OvertakeDistance < overtakerComponent.DistanceToCarInRight &&
+                                            overtakerComponent.CarInRightSpeed >= speedComponent.DefaultSpeed)))
             {
-                CommandBuffer.AddComponent(index, entity, new LaneChangeComponent { LastLane = laneComponent.Lane, CurrentTime = 0});
-                laneComponent.Lane -= 1; 
+                Random random = new Random();
+                random.InitState((uint) ((System.DateTime.Now.Ticks) * (index + 1)));
+                if (random.NextFloat(0, 100) >= 90)
+                {
+                    CommandBuffer.AddComponent(index, entity,
+                        new LaneChangeComponent {LastLane = laneComponent.Lane, CurrentTime = 0});
+                    laneComponent.Lane -= 1;
+                }
             }
         }
     }
@@ -37,11 +43,11 @@ public class SideSensorSystem : JobComponentSystem
 
         public void Execute(Entity entity, int index, [ReadOnly] ref PositionComponent positionComponent, ref LaneComponent laneComponent, [ReadOnly] ref OvertakerComponent overtakerComponent)
         {
-            if (overtakerComponent.CanTurnLeft)
-            {
-                CommandBuffer.AddComponent(index, entity, new LaneChangeComponent {LastLane = laneComponent.Lane, CurrentTime = 0});
-                laneComponent.Lane += 1;
-            }
+//            if (overtakerComponent.CanTurnLeft)
+//            {
+//                CommandBuffer.AddComponent(index, entity, new LaneChangeComponent {LastLane = laneComponent.Lane, CurrentTime = 0});
+//                laneComponent.Lane += 1;
+//            }
         }
     }
     
