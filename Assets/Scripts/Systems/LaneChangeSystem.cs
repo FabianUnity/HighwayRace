@@ -32,7 +32,6 @@ public class LaneChangeSystem : JobComponentSystem
                 positionComponent.Position.y = LaneRadius[laneComponent.Lane];
                 if (laneComponent.Lane > laneChangeComponent.LastLane)
                 {
-                    
                     laneChangeComponent.IsWantToOvertake = false;
                 }
                 laneChangeComponent.LastLane = laneComponent.Lane;
