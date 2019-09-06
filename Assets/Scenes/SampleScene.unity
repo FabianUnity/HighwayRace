@@ -357,7 +357,7 @@ MonoBehaviour:
     x: 0.1
     y: 0.1
   rangeOvertakeEargerness:
-    x: 0.5
+    x: 0.3
     y: 2
 --- !u!114 &974169070
 MonoBehaviour:

@@ -49,7 +49,7 @@ public class SpawnSystem : MonoBehaviour
         for (int i = 0; i < carAmount; i++)
         {
             random.InitState((uint)((System.DateTime.Now.Ticks) * (i+1)));
-            lane = random.NextInt(0, 4);
+            lane = 0;//random.NextInt(0, 4);
             radius = laneRadius[lane];
             var instance = entityManager.Instantiate(prefab);
             position.x = radius * math.cos(angle);
@@ -59,7 +59,7 @@ public class SpawnSystem : MonoBehaviour
             float speed = random.NextFloat(rangeSpeed.x, rangeSpeed.y);
             entityManager.AddComponentData(instance, new SpeedComponent {CurrentSpeed = speed, DefaultSpeed = speed, OvertakeSpeed = speed+random.NextFloat(rangeOvertakeSpeed.x, rangeOvertakeSpeed.y), TargetSpeed = speed});
             entityManager.AddComponentData(instance, new CarElementPositionComponent(){Value = i});
-            entityManager.AddComponentData(instance, new OvertakerComponent{ CarInFrontSpeed = speed, OvertakeDistance = random.NextFloat(rangeOvertakeDistance.x, rangeOvertakeDistance.y), OvertakeEargerness = random.NextFloat(rangeOvertakeEargerness.x, rangeOvertakeEargerness.y)});
+            entityManager.AddComponentData(instance, new OvertakerComponent{ DistanceToCarInFront = float.MaxValue, CarInFrontSpeed = speed, OvertakeDistance = random.NextFloat(rangeOvertakeDistance.x, rangeOvertakeDistance.y), OvertakeEargerness = random.NextFloat(rangeOvertakeEargerness.x, rangeOvertakeEargerness.y)});
             entityManager.AddComponentData(instance, new LaneComponent { Lane = lane });
             entityManager.AddComponentData(instance, new LaneChangeComponent { LastLane = lane, IsWantToOvertake = false });
             entityManager.AddComponentData(instance, new ColorComponent { Value = 1 });

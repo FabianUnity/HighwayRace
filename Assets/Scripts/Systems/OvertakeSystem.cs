@@ -15,23 +15,23 @@ public class OvertakeSystem : JobComponentSystem
         
         public void Execute(ref OvertakingComponent overtakingComponent, ref SpeedComponent speed, [ReadOnly] ref OvertakerComponent overtaker)
         {
-            if (overtakingComponent.TimeLeft <= 0) return;
-            
-            overtakingComponent.TimeLeft -= DeltaTime;
+            if (overtakingComponent.TimeLeft <= 0)
+                overtakingComponent.TimeLeft = 0;
+            else
+                overtakingComponent.TimeLeft -= DeltaTime;
 
             if (overtaker.Blocked)
             {
                 overtakingComponent.TimeLeft = 0;
             }
-            else if (overtakingComponent.TimeLeft < 0)
+            
+            if (overtakingComponent.TimeLeft <= 0)
             {
-                speed.TargetSpeed = speed.DefaultSpeed;
                 speed.CurrentSpeed = speed.TargetSpeed;
             }
             else
             {
-                speed.TargetSpeed = speed.OvertakeSpeed;
-                speed.CurrentSpeed = speed.TargetSpeed;
+                speed.CurrentSpeed = speed.OvertakeSpeed;
             }
         }
     }
