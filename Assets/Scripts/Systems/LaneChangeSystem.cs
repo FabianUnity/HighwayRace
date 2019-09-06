@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -15,6 +16,7 @@ public class LaneChangeSystem : JobComponentSystem
         _highWayQuery = GetEntityQuery(typeof(HighWayComponent));
     }
     
+    [BurstCompile]
     struct ChangeLaneJob : IJobForEach<PositionComponent, LaneComponent, LaneChangeComponent>
     {
         public float4 LaneRadius;

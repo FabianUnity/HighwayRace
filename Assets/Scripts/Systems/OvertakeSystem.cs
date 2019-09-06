@@ -9,6 +9,7 @@ using UnityEngine;
 public class OvertakeSystem : JobComponentSystem
 {
 
+    [BurstCompile]
     public struct OvertakingJob : IJobForEach<OvertakingComponent, SpeedComponent, OvertakerComponent>
     {
         public float DeltaTime;

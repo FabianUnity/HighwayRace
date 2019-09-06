@@ -1,4 +1,5 @@
 ﻿using Components;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -11,7 +12,7 @@ public class SideSensorSystem : JobComponentSystem
     public const float BACK_DISTANCE = 0.1f;
     public const float SIDE_DISTANCE = 0.1f;
     
-    
+    [BurstCompile]
     struct RightSensorJob : IJobForEach<PositionComponent, LaneComponent, OvertakerComponent, SpeedComponent, LaneChangeComponent, OvertakingComponent>
     {
         public void Execute([ReadOnly]ref PositionComponent positionComponent, ref LaneComponent laneComponent, ref OvertakerComponent overtakerComponent, [ReadOnly] ref SpeedComponent speedComponent, ref LaneChangeComponent laneChangeComponent, ref OvertakingComponent overtakingComponent)
