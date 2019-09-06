@@ -21,10 +21,10 @@ public class SideSensorSystem : JobComponentSystem
 
         public void Execute(Entity entity, int index, [ReadOnly]ref PositionComponent positionComponent, ref LaneComponent laneComponent, ref OvertakerComponent overtakerComponent, [ReadOnly] ref SpeedComponent speedComponent, ref LaneChangeComponent laneChangeComponent, ref OvertakingComponent overtakingComponent)
         {
-            if(laneChangeComponent.LastLane != laneComponent.Lane)
+            if(laneChangeComponent.LastLane != laneComponent.Lane || overtakingComponent.TimeLeft > 0)
                 return;
             
-            if (laneComponent.Lane > 0 && (overtakerComponent.OvertakeDistance - overtakerComponent.DistanceToCarInRight < -0.5f ||
+            if (laneComponent.Lane > 0 && (overtakerComponent.OvertakeDistance < overtakerComponent.DistanceToCarInRight ||
                                            (overtakerComponent.OvertakeDistance >= overtakerComponent.DistanceToCarInRight &&
                                                overtakerComponent.CarInRightSpeed >= speedComponent.DefaultSpeed)))
             {
@@ -39,9 +39,9 @@ public class SideSensorSystem : JobComponentSystem
                 }
             }
             
-            if (laneChangeComponent.IsWantToOvertake && laneComponent.Lane < 3 && (overtakerComponent.OvertakeDistance - overtakerComponent.DistanceToCarInLeft < -0.5f||
-                                           (overtakerComponent.OvertakeDistance >= overtakerComponent.DistanceToCarInLeft &&
-                                            overtakerComponent.CarInLeftSpeed >= speedComponent.DefaultSpeed)))
+            if (laneChangeComponent.IsWantToOvertake && laneComponent.Lane < 3 && (overtakerComponent.OvertakeDistance < overtakerComponent.DistanceToCarInLeft ||
+                                                                                   overtakerComponent.OvertakeDistance >= overtakerComponent.DistanceToCarInRight &&
+                                                                                   overtakerComponent.CarInRightSpeed >= speedComponent.DefaultSpeed))
             {
                 laneChangeComponent.LastLane = laneComponent.Lane;
                 laneChangeComponent.CurrentTime = 0;
