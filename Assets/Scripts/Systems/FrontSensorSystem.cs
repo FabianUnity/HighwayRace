@@ -8,17 +8,19 @@ public class FrontSensorSystem : JobComponentSystem
     [BurstCompile]
     struct FronSensorJob : IJobForEach<PositionComponent, SpeedComponent, OvertakerComponent>
     {
-        public void Execute([ReadOnly] ref PositionComponent positionComponent, ref SpeedComponent speedComponent, [ReadOnly]ref OvertakerComponent overtakerComponent)
+        public void Execute([ReadOnly] ref PositionComponent positionComponent, ref SpeedComponent speedComponent, ref OvertakerComponent overtakerComponent)
         {
             if (overtakerComponent.DistanceToCarInFront < overtakerComponent.OvertakeDistance)
             {
                 speedComponent.TargetSpeed = overtakerComponent.CarInFrontSpeed;
                 speedComponent.CurrentSpeed = overtakerComponent.CarInFrontSpeed;
+                overtakerComponent.Blocked = true;
             }
             else
             {
                 speedComponent.TargetSpeed = speedComponent.DefaultSpeed;
                 speedComponent.CurrentSpeed = speedComponent.DefaultSpeed;
+                overtakerComponent.Blocked = false;
             }
         }
     }
