@@ -9,7 +9,7 @@ using Random = Unity.Mathematics.Random;
 
 public class SideSensorSystem : JobComponentSystem
 {
-    public const float BACK_DISTANCE = 0.1f;
+    public const float BACK_DISTANCE = 0.2f;
     public const float SIDE_DISTANCE = 0.1f;
     
     [BurstCompile]
