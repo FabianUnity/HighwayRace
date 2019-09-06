@@ -18,6 +18,7 @@ public class OvertakeSystem : JobComponentSystem
             if (overtakingComponent.TimeLeft <= 0) return;
             
             overtakingComponent.TimeLeft -= DeltaTime;
+
             if (overtaker.Blocked)
             {
                 overtakingComponent.TimeLeft = 0;
@@ -25,6 +26,13 @@ public class OvertakeSystem : JobComponentSystem
             else if (overtakingComponent.TimeLeft < 0)
             {
                 speed.TargetSpeed = speed.DefaultSpeed;
+                speed.CurrentSpeed = speed.TargetSpeed;
+            }
+            else
+            {
+                speed.TargetSpeed = speed.OvertakeSpeed;
+                speed.CurrentSpeed = speed.TargetSpeed;
+                Debug.Log("accelerating");
             }
         }
     }
