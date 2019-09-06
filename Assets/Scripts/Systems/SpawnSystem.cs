@@ -1,3 +1,4 @@
+using Components;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -50,6 +51,7 @@ public class SpawnSystem : MonoBehaviour
             entityManager.AddComponentData(instance, new CarElementPositionComponent(){Value = i});
             entityManager.AddComponentData(instance, new OvertakerComponent{ CarInFrontSpeed = 0, OvertakeDistance = random.NextFloat(0.05f, 0.1f) });
             entityManager.AddComponentData(instance, new LaneComponent { Lane = lane });
+            entityManager.AddComponentData(instance, new ColorComponent { Value = 1 });
             carElementArray[i] = new CarBufferElement()
             {
                 Position = 0,

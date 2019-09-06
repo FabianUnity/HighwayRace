@@ -1,5 +1,7 @@
-﻿using Unity.Entities;
+﻿using Unity.Collections;
+using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine;
 
@@ -16,8 +18,14 @@ public class Highway : MonoBehaviour
         get { return radius; }
     }
 
+    public Mesh carMesh;
+    public Material baseMaterial;
+    public Gradient color;
+    public RenderMesh[] _renderers;
+
     public void Start()
     {
+        SetupMaterials();
         Entity prefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(piecePrefab, World.Active);
         var entityManager = World.Active.EntityManager;
         float length = 2 * math.PI * radius;
@@ -38,5 +46,24 @@ public class Highway : MonoBehaviour
             
         }
         Camera.main.transform.position = Vector3.up*(radius*2);
+    }
+
+    private static Highway _instance;
+    private void SetupMaterials()
+    {
+        _instance = this;
+        const int materialCount = 10;
+        _renderers = new RenderMesh[materialCount];
+        for (var i = 0; i < materialCount; i++)
+        {
+            var newMaterial = new Material(baseMaterial);
+            newMaterial.color = color.Evaluate((float)i / materialCount);
+            _renderers[i] = new RenderMesh(){mesh = carMesh, material = newMaterial};
+        }
+    }
+
+    public static RenderMesh[] GetRenderMeshes()
+    {
+        return _instance._renderers;
     }
 }

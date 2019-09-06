@@ -107,32 +107,40 @@ public class RaceSystem : JobComponentSystem
             // Car in right
             speed = CarBufferElement._2PI;
             distance = CarBufferElement._2PI;
-            for (int i = 1; i < CarElements.Length; i++)
+            if (carElement.Lane > 0)
             {
-                var nextCar = CarElements[(carIndex + i) % CarElements.Length];
-                if (nextCar.Lane == carElement.Lane - 1)
+                for (int i = 1; i < CarElements.Length; i++)
                 {
-                    distance = CarBufferElement.Distance(carElement, nextCar);
-                    speed = nextCar.Speed;
-                    break;
+                    var nextCar = CarElements[(carIndex + i) % CarElements.Length];
+                    if (nextCar.Lane == carElement.Lane - 1)
+                    {
+                        distance = CarBufferElement.Distance(carElement, nextCar);
+                        speed = nextCar.Speed;
+                        break;
+                    }
                 }
             }
+
             overtaker.CanTurnRight = distance > 0.05f && carElement.Lane > 0;
             overtaker.CarInRightSpeed = speed;
             
             // Car in left
             speed = CarBufferElement._2PI;
             distance = CarBufferElement._2PI;
-            for (int i = 1; i < CarElements.Length; i++)
+            if (carElement.Lane < 3)
             {
-                var nextCar = CarElements[(carIndex + i) % CarElements.Length];
-                if (nextCar.Lane == carElement.Lane + 1)
+                for (int i = 1; i < CarElements.Length; i++)
                 {
-                    distance = CarBufferElement.Distance(carElement, nextCar);
-                    speed = nextCar.Speed;
-                    break;
+                    var nextCar = CarElements[(carIndex + i) % CarElements.Length];
+                    if (nextCar.Lane == carElement.Lane + 1)
+                    {
+                        distance = CarBufferElement.Distance(carElement, nextCar);
+                        speed = nextCar.Speed;
+                        break;
+                    }
                 }
             }
+
             overtaker.CanTurnLeft = distance > 0.05f && carElement.Lane < 3;
             //overtaker.CarInLeftSpeed = speed;
         }
