@@ -15,8 +15,6 @@ public class FrontSensorSystem : JobComponentSystem
 
         public void Execute([ReadOnly] ref PositionComponent positionComponent, ref SpeedComponent speedComponent, [ReadOnly]ref OvertakerComponent overtakerComponent, ref LaneChangeComponent laneChangeComponent)
         {
-            if(laneChangeComponent.IsWantToOvertake)
-                return;
             if (overtakerComponent.DistanceToCarInFront < overtakerComponent.OvertakeDistance)
             {
                 var targetSpeed = math.min(speedComponent.DefaultSpeed, overtakerComponent.CarInFrontSpeed);

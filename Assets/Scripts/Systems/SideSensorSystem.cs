@@ -8,8 +8,8 @@ using Random = Unity.Mathematics.Random;
 
 public class SideSensorSystem : JobComponentSystem
 {
-    public const float BACK_DISTANCE = 0.3f;
-    public const float SIDE_DISTANCE = 0.2f;
+    public const float BACK_DISTANCE = 0.1f;
+    public const float SIDE_DISTANCE = 0.1f;
     
     
     struct RightSensorJob : IJobForEach<PositionComponent, LaneComponent, OvertakerComponent, SpeedComponent, LaneChangeComponent, OvertakingComponent>
