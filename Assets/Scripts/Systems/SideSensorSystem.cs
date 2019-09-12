@@ -1,4 +1,5 @@
 ﻿using Components;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -11,12 +12,12 @@ public class SideSensorSystem : JobComponentSystem
     public const float BACK_DISTANCE = 0.2f;
     public const float SIDE_DISTANCE = 0.1f;
     
-    
+    [BurstCompile]
     struct RightSensorJob : IJobForEach<PositionComponent, LaneComponent, OvertakerComponent, SpeedComponent, LaneChangeComponent, OvertakingComponent>
     {
         public void Execute([ReadOnly]ref PositionComponent positionComponent, ref LaneComponent laneComponent, ref OvertakerComponent overtakerComponent, [ReadOnly] ref SpeedComponent speedComponent, ref LaneChangeComponent laneChangeComponent, ref OvertakingComponent overtakingComponent)
         {
-            if(laneChangeComponent.LastLane != laneComponent.Lane && overtakingComponent.TimeLeft > 0)
+            if(laneChangeComponent.LastRadius != laneComponent.Lane && overtakingComponent.TimeLeft > 0)
                 return;
 
             bool eargerness = overtakerComponent.OvertakeEargerness <=
@@ -27,7 +28,7 @@ public class SideSensorSystem : JobComponentSystem
                 overtakerComponent.DistanceToCarInRightBack >= BACK_DISTANCE)
             {
                 laneChangeComponent.CurrentTime = 0;
-                laneChangeComponent.LastLane = laneComponent.Lane;
+                laneChangeComponent.LastRadius = positionComponent.Position.y;
                 laneComponent.Lane -= 1;
                 return;
             }
@@ -37,14 +38,12 @@ public class SideSensorSystem : JobComponentSystem
                 overtakerComponent.DistanceToCarInLeftBack >= BACK_DISTANCE)
             {
                 laneChangeComponent.CurrentTime = 0;
-                laneChangeComponent.LastLane = laneComponent.Lane;
+                laneChangeComponent.LastRadius = positionComponent.Position.y;
                 laneComponent.Lane += 1;
-                
                 //set time to overtake
 
                 overtakerComponent.Blocked = false;
                 overtakingComponent.TimeLeft = math.min(2,(overtakerComponent.DistanceToCarInFront) / (overtakerComponent.CarInFrontSpeed - speedComponent.OvertakeSpeed) + 1);
-
             }
         }
     }
