@@ -261,7 +261,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 10000
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -339,7 +339,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   carPrefab: {fileID: 1999935204370666, guid: eb09540518ebb214aba8500b41634a1b, type: 3}
-  carAmount: 40
+  carAmount: 10000
   highway: {fileID: 974169070}
   colors:
   - {r: 0.068057805, g: 0.9433962, b: 0.06674972, a: 1}
@@ -354,8 +354,8 @@ MonoBehaviour:
     x: 0.05
     y: 0.08
   rangeOvertakeSpeed:
-    x: 0.1
-    y: 0.2
+    x: 0.05
+    y: 0.1
   rangeOvertakeEargerness:
     x: 0.1
     y: 1
@@ -371,7 +371,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c06cbf49da72b459c81ca82dc84ec339, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 40
+  radius: 500
   piecePrefab: {fileID: 1852285047314088, guid: f8a5c2ec8b2ff46d89138941be83be2a,
     type: 3}
   pieceSize: 5

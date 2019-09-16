@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class LaneChangeSystem : JobComponentSystem
 {
-    private const float DURATION = 0.3f;
+    private const float DURATION = 1f;
     
     private EntityQuery _highWayQuery;
     
@@ -24,7 +24,7 @@ public class LaneChangeSystem : JobComponentSystem
 
         public void Execute(ref PositionComponent positionComponent,[ReadOnly] ref LaneComponent laneComponent, ref LaneChangeComponent laneChangeComponent)
         {
-            if(laneComponent.Lane == laneChangeComponent.LastLane)
+            if(laneComponent.Lane == laneChangeComponent.LastRadius)
                 return;
             
             laneChangeComponent.CurrentTime += DeltaTime;
@@ -32,15 +32,15 @@ public class LaneChangeSystem : JobComponentSystem
             if (laneChangeComponent.CurrentTime >= DURATION)
             {
                 positionComponent.Position.y = LaneRadius[laneComponent.Lane];
-                if (laneComponent.Lane > laneChangeComponent.LastLane)
+                if (laneComponent.Lane > laneChangeComponent.LastRadius)
                 {
                     laneChangeComponent.IsWantToOvertake = false;
                 }
-                laneChangeComponent.LastLane = laneComponent.Lane;
+                laneChangeComponent.LastRadius = laneComponent.Lane;
                 return;
             }
             
-            positionComponent.Position.y = math.lerp(LaneRadius[laneChangeComponent.LastLane], LaneRadius[laneComponent.Lane], laneChangeComponent.CurrentTime/DURATION);
+            positionComponent.Position.y = math.lerp(laneChangeComponent.LastRadius, LaneRadius[laneComponent.Lane], laneChangeComponent.CurrentTime/DURATION);
         }
     }
     

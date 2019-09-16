@@ -8,7 +8,6 @@ using UnityEngine;
 
 public class FrontSensorSystem : JobComponentSystem
 {
-
     [BurstCompile]
     struct FrontSensorJob : IJobForEach<PositionComponent, SpeedComponent, OvertakerComponent, LaneChangeComponent>
     {
@@ -18,11 +17,15 @@ public class FrontSensorSystem : JobComponentSystem
         {
             if (overtakerComponent.DistanceToCarInFront < overtakerComponent.OvertakeDistance)
             {
+                
                 var targetSpeed = math.min(speedComponent.DefaultSpeed, overtakerComponent.CarInFrontSpeed);
                 speedComponent.TargetSpeed = targetSpeed;
                 overtakerComponent.Blocked = true;
-                if (overtakerComponent.OvertakeEargerness > overtakerComponent.CarInFrontSpeed / speedComponent.DefaultSpeed)
+                if (overtakerComponent.OvertakeEargerness >
+                    overtakerComponent.CarInFrontSpeed / speedComponent.DefaultSpeed)
+                {
                     laneChangeComponent.IsWantToOvertake = true;
+                }
             }
             else
             {

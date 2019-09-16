@@ -7,6 +7,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 
+[UpdateAfter(typeof(SideSensorSystem))]
 public class RaceSystem : JobComponentSystem
 {
     //private BeginInitializationEntityCommandBufferSystem _entityCommandBufferSystem;
@@ -83,7 +84,7 @@ public class RaceSystem : JobComponentSystem
         
         public void Execute(ref OvertakerComponent overtaker, [ReadOnly] ref CarElementPositionComponent carElementPosition)
         {
-            //TODO: Improve this sh*t
+            //TODO: Improve this
             
             var carIndex = carElementPosition.Value;
             var carElement = CarElements[carIndex];
