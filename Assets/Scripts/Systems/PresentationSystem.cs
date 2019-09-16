@@ -66,8 +66,8 @@ public class PresentationSystem : JobComponentSystem
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
         var commandBuffer = entityCommandBufferSystem.CreateCommandBuffer().ToConcurrent();
-        var changeColorJob = new ColorChangeJob() {CommandBuffer = commandBuffer}.Schedule(this, inputDeps);
-        var colorJob = new ColorJob(){CommandBuffer = commandBuffer}.Schedule(this,changeColorJob);
+        var colorJob = new ColorJob(){CommandBuffer = commandBuffer}.Schedule(this,inputDeps);
+        var changeColorJob = new ColorChangeJob() {CommandBuffer = commandBuffer}.Schedule(this, colorJob);
         
         //entityCommandBufferSystem.AddJobHandleForProducer(colorJob);
         entityCommandBufferSystem.AddJobHandleForProducer(changeColorJob);
